@@ -6,6 +6,10 @@
 
 
 import * as THREE from 'three'
+import { ShaderPass as VanShaderPass , EffectComposer as VanEffectComposer, RenderPass as VanRenderPass, EffectPass } from "postprocessing"
+import {GammaCorrectionEffect} from 'postprocessing'
+import { HalfFloatType } from "three";
+
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'  
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
@@ -39,7 +43,7 @@ export default class PostProcessing
             this.ramenShop = this.experience.world.ramenShop
             this.setBloomConfig()
             this.setBloomObjects()
-            this.setRenderTarget()
+            // this.setRenderTarget()
             this.setPasses()
             this.setUpBloom()
         })
@@ -77,39 +81,39 @@ export default class PostProcessing
         this.ramenShop.sideScreen.layers.enable(this.BLOOM_SCENE)
     }
 
-    setRenderTarget()
-    {
-        if(this.renderer.instance.capabilities.isWebGL2)
-        {
-            this.renderTarget = new THREE.WebGLMultisampleRenderTarget
-            (
-                800,
-                600,
-                {
-                    minFilter: THREE.LinearFilter,
-                    magFilter: THREE.LinearFilter,
-                    format: THREE.RGBAFormat,
-                    encoding: THREE.sRGBEncoding
-                }
-            )
-            console.log('using WebGLMultiSampleRenderTarget')
-        }
-        else
-        {
-            this.renderTarget = new THREE.WebGLRenderTarget
-            (
-                800,
-                600,
-                {
-                    minFilter: THREE.LinearFilter,
-                    magFilter: THREE.LinearFilter,
-                    format: THREE.RGBAFormat,
-                    encoding: THREE.sRGBEncoding
-                }
-            )
-            console.log('using WebGLRenderTarget')
-        }
-    }
+    // setRenderTarget()
+    // {
+    //     if(this.renderer.instance.capabilities.isWebGL2)
+    //     {
+    //         this.renderTarget = new THREE.WebGLMultisampleRenderTarget
+    //         (
+    //             800,
+    //             600,
+    //             {
+    //                 minFilter: THREE.LinearFilter,
+    //                 magFilter: THREE.LinearFilter,
+    //                 format: THREE.RGBAFormat,
+    //                 encoding: THREE.sRGBEncoding
+    //             }
+    //         )
+    //         console.log('using WebGLMultiSampleRenderTarget')
+    //     }
+    //     else
+    //     {
+    //         this.renderTarget = new THREE.WebGLRenderTarget
+    //         (
+    //             800,
+    //             600,
+    //             {
+    //                 minFilter: THREE.LinearFilter,
+    //                 magFilter: THREE.LinearFilter,
+    //                 format: THREE.RGBAFormat,
+    //                 encoding: THREE.sRGBEncoding
+    //             }
+    //         )
+    //         console.log('using WebGLRenderTarget')
+    //     }
+    // }
 
     setPasses()
     {
@@ -126,7 +130,7 @@ export default class PostProcessing
         this.bloomComposer.addPass(this.bloomPass)
 
 
-        this.finalPass = new ShaderPass
+        this.finalPass = new VanShaderPass
         (
             new THREE.ShaderMaterial
             ( {
@@ -144,21 +148,25 @@ export default class PostProcessing
         )
 
         this.finalPass.needsSwap = true
-        this.finalComposer = new EffectComposer( this.renderer.instance, this.renderTarget)
+        this.finalComposer = new VanEffectComposer( this.renderer.instance, {
+            multisampling: 8, frameBufferType: HalfFloatType})
 
         this.finalComposer.setSize(this.sizes.width, this.sizes.height)
-        this.finalComposer.setPixelRatio(Math.min(this.sizes.pixelRatio, 2))
+        // this.finalComposer.setPixelRatio(Math.min(this.sizes.pixelRatio, 2))
 
-        this.finalComposer.addPass( this.renderPass )
+        this.VanRenderPass = new VanRenderPass(this.scene, this.camera.instance)
+
+        this.finalComposer.addPass( this.VanRenderPass )
+        
         this.finalComposer.addPass( this.finalPass )
 
         // SMAA pass if WebGL2 is not available
-        if(!this.renderer.instance.capabilities.isWebGL2)
-        {
-            this.smaaPass = new SMAAPass()
-            this.finalComposer.addPass(this.smaaPass)
-            console.log('Using SMAA')
-        }
+        // if(!this.renderer.instance.capabilities.isWebGL2)
+        // {
+        //     this.smaaPass = new SMAAPass()
+        //     this.finalComposer.addPass(this.smaaPass)
+        //     console.log('Using SMAA')
+        // }
 
         this.enableUpdate()
 

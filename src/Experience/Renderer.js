@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { sRGBEncoding } from 'three'
 import Experience from './Experience.js'
 
 export default class Renderer
@@ -18,12 +19,16 @@ export default class Renderer
     {
         this.instance = new THREE.WebGLRenderer({
             canvas: this.canvas,
-            powerPreference: 'high-performance'
+            powerPreference: 'high-performance',
+            antialias: false,
+            stencil: false,
+            depth: false,
+            outputEncoding: THREE.sRGBEncoding
         })
 
         this.instance.setSize(this.sizes.width, this.sizes.height)
         this.instance.setPixelRatio(Math.min(this.sizes.pixelRatio, 2))
-        this.instance.outputEncoding = THREE.sRGBEncoding
+        this.instance.outputEncoding = sRGBEncoding
     }
 
     resize()
