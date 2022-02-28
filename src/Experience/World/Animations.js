@@ -29,13 +29,10 @@ export default class Animations
             this.enableUpdate()
             
             this.photoCounter = 0
+
             this.sideScreen = 1
 
-            this.changeSideScreen()
-
-            setInterval(() => {
-                this.changeSideScreen()
-            }, 7000)
+            this.materials.sideScreenMaterial.uniforms.texture2.value = this.resources.items.sideScreen2Texture
         })
     }
 
@@ -54,6 +51,18 @@ export default class Animations
                     this.controller.videoControls.smallScreen2()
                 }
             }
+            {
+                if(this.materials.sideScreenMaterial.uniforms.progress.value >= 1)
+                {
+                    this.changeSideScreen()
+                    
+                }
+                else{
+                    this.materials.sideScreenMaterial.uniforms.progress.value += 0.002
+                    console.log(this.materials.sideScreenMaterial.uniforms.progress.value)
+                    
+                }
+            }
         }
     }
 
@@ -61,28 +70,30 @@ export default class Animations
     {
         switch(this.sideScreen) {
             case 1:
-                this.slideTransition(
-                    this.materials.sideScreenMaterial,
-                    this.resources.items.sideScreen2Texture,
-                    7
-                )
+                this.materials.sideScreenMaterial.uniforms.texture1 = this.resources.items.sideScreen2Texture
+                this.materials.sideScreenMaterial.uniforms.texture2 = this.resources.items.sideScreen3Texture
+    
+                
+                this.materials.sideScreenMaterial.uniforms.progress.value = 0
+                
                 this.sideScreen +=1
+                console.log(this.sideScreen)
                 break
             case 2:
-                this.slideTransition(
-                    this.materials.sideScreenMaterial,
-                    this.resources.items.sideScreen3Texture,
-                    7
-                )
+
+                this.materials.sideScreenMaterial.uniforms.texture1 = this.resources.items.sideScreen1Texture
+                
+                this.materials.sideScreenMaterial.uniforms.progress.value = 0
                 this.sideScreen +=1
+                console.log(this.sideScreen)
                 break
             case 3:
-                this.slideTransition(
-                    this.materials.sideScreenMaterial,
-                    this.resources.items.sideScreen1Texture,
-                    7
-                )
+                this.materials.sideScreenMaterial.uniforms.texture1 = this.resources.items.sideScreen1Texture
+
+                
+                this.materials.sideScreenMaterial.uniforms.progress.value = 0
                 this.sideScreen = 1
+                console.log(this.sideScreen)
                 break
         }
     }
